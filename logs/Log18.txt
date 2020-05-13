@@ -1,0 +1,4 @@
+2020-04-01 14:37:44.586577 —---— initialisation done
+2020-04-01 14:38:05.608191 —---— 3 balls and the next cell is empty
+2020-04-01 14:38:15.439418 —---— after i will push
+2020-04-01 14:38:15.455774 —---— [[5, 3]].. pushed to

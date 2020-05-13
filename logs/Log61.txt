@@ -1,0 +1,10 @@
+2020-04-25 01:08:05.857226 —---— initialisation done
+2020-04-25 03:04:52.190034 —---— 3 balls and the next cell is empty
+2020-04-25 03:05:01.671156 —---— after i will push
+2020-04-25 03:05:01.690161 —---— [[1, 1]].. pushed to
+2020-04-25 03:05:01.712343 —---— 3 balls and the next cell is other color after empty
+2020-04-25 03:05:21.154803 —---— 3 balls and the next cell is empty
+2020-04-25 03:05:30.877524 —---— bad! try again
+2020-04-25 03:05:36.658067 —---— 3 balls and the next cell is empty
+2020-04-25 03:06:04.676462 —---— 3 balls and the next cell is empty
+2020-04-25 03:06:23.926637 —---— 3 balls and the next cell is empty

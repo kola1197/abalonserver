@@ -1,0 +1,2 @@
+2020-04-24 23:36:48.121197 —---— initialisation done
+2020-04-24 23:37:41.166931 —---— 3 balls and the next cell is empty
