@@ -5,45 +5,46 @@ from Logger import Logger
 from time import sleep
 import easygui
 import os
-from server.client import Client
-path = os.getcwd()+"\\image\\"
+from MainServer.client import Client
+
+path = os.getcwd() + "\\image\\"
 root = Tk()
 mainmenu = Menu(root)
 root.config(menu=mainmenu)
 
-
 canv = Canvas()
 canv.pack(fill=BOTH, expand=1)
 button_size = 83
-subs=75
-subs1=2
-black = PhotoImage(file=path+"black.png")
+subs = 75
+subs1 = 2
+black = PhotoImage(file=path + "black.png")
 black = black.subsample(subs)
-white = PhotoImage(file=path+"white.png")
+white = PhotoImage(file=path + "white.png")
 white = white.subsample(subs)
-none = PhotoImage(file=path+"none.png")
+none = PhotoImage(file=path + "none.png")
 none = none.subsample(subs)
-but1 = PhotoImage(file=path+"But1.png")
+but1 = PhotoImage(file=path + "But1.png")
 but1 = but1.subsample(subs1)
-but2 = PhotoImage(file=path+"But2.png")
+but2 = PhotoImage(file=path + "But2.png")
 but2 = but2.subsample(subs1)
-but3 = PhotoImage(file=path+"But3.png")
+but3 = PhotoImage(file=path + "But3.png")
 but3 = but3.subsample(subs1)
-but4 = PhotoImage(file=path+"But4.png")
+but4 = PhotoImage(file=path + "But4.png")
 but4 = but4.subsample(subs1)
-but5 = PhotoImage(file=path+"But5.png")
+but5 = PhotoImage(file=path + "But5.png")
 but5 = but5.subsample(subs1)
-but6 = PhotoImage(file=path+"But6.png")
+but6 = PhotoImage(file=path + "But6.png")
 but6 = but6.subsample(subs1)
-yellow_white = PhotoImage(file=path+"whiteact.png")
+yellow_white = PhotoImage(file=path + "whiteact.png")
 yellow_white = yellow_white.subsample(subs)
-yellow_black = PhotoImage(file=path+"blackact.png")
+yellow_black = PhotoImage(file=path + "blackact.png")
 yellow_black = yellow_black.subsample(subs)
 
 root.geometry('1000x1000')
 host = '192.168.88.165'
 port = 777
 addr = (host, port)
+
 
 class Main:
     def __init__(self):
@@ -58,20 +59,18 @@ class Main:
 
         self.client = Client()
 
-
-
-    def move_restart(self):      #сброс хода
+    def move_restart(self):  # сброс хода
         self.selected.clear()
         self.update()
 
-    def to_pixels(self, x, y): #cell's coord to pixels
+    def to_pixels(self, x, y):  # cell's coord to pixels
 
         x = 293 + button_size * x - y * button_size / 2
         y = 205 + y * button_size
         self.board.Logger.Write((x, y))
         return x, y
 
-    def make_it_yellow(self):         #выделение шарика
+    def make_it_yellow(self):  # выделение шарика
         for ball in self.selected:
             n = self.board.num[ball[0]].index(ball[1])
             m = self.board.draw_array[ball[0]][n]
@@ -82,7 +81,7 @@ class Main:
             else:
                 self.move_restart()
 
-    def tap(self, X, Y):    # обработка нажатий на клетки
+    def tap(self, X, Y):  # обработка нажатий на клетки
         var = self.selected
         deleg = self.make_it_yellow
         deleg1 = self.update
@@ -101,7 +100,7 @@ class Main:
 
         return wrapper  # проверить цвет нужного нам шарика
 
-    def get_color(self, ball, x, y):        #определение цвета шарика по его координатам на поле
+    def get_color(self, ball, x, y):  # определение цвета шарика по его координатам на поле
         if 0 <= ball[0] <= 8:
             if ball[1] in self.board.num[ball[0]]:
                 n = self.board.num[ball[0]].index(ball[1])
@@ -111,25 +110,25 @@ class Main:
         else:
             return 'out'
 
-    def simple_move(self, x, y): # ход только своими фишками
-        for ball in self.selected: # заменяю выделенные клетки на пустые
+    def simple_move(self, x, y):  # ход только своими фишками
+        for ball in self.selected:  # заменяю выделенные клетки на пустые
             n = self.board.num[ball[0]].index(ball[1])
             self.board.draw_array[ball[0]][n] = 0
         for ball in self.selected:  # меняю цвета с учетом сдвига на цвет хода
             m = self.board.num[ball[0] + x].index(ball[1] + y)
             self.board.draw_array[ball[0] + x][m] = self.board.white_is_move
 
-       # self.board.white_is_move = - self.board.white_is_move ###потому что клиент!
+        # self.board.white_is_move = - self.board.white_is_move ###потому что клиент!
         self.move_restart()
         self.board.Logger.WriteGameInfo(self.board.draw_array)
 
-######################клиентское
+        ######################клиентское
         self.client.sending(str(self.board.draw_array))
 
         board = self.client.receiving()
         for a in board:
             d = self.deskarray_from_str_to_tuple(a)
-            d= [ list(d[i]) for i in range(9) ]
+            d = [list(d[i]) for i in range(9)]
 
             break
 
@@ -137,11 +136,10 @@ class Main:
         print(self.board.draw_array)
         self.update()
 
+        self.board.cmove += 1
+        # тут мы двигаем шарики соперника
 
-        self.board.cmove+=1
-            # тут мы двигаем шарики соперника
-
-    def move(self, x, y):     # сдвиг шариков противника
+    def move(self, x, y):  # сдвиг шариков противника
         self.board.Logger.Write('after i will push')
         for ball in self.pushed:
             n = self.board.num[ball[0]].index(ball[1])
@@ -226,14 +224,15 @@ class Main:
 
                         # нужно проверить перед move, что цвет массива совпадает c white_is_move (что ваш ход)
 
-    def check_color(self, x, y):   # проверка, ваш ли ход
+    def check_color(self, x, y):  # проверка, ваш ли ход
         ball = self.selected[0]
         if self.get_color(ball, x, y) == self.board.white_is_move:
             self.next_cell(x, y)
         else:
             self.move_restart()
 
-    def check_color_and_next_not_other_colored(self, x, y):   #если несколько шариков в ряд и они идут по прямой, отличной от той, на которой лежат
+    def check_color_and_next_not_other_colored(self, x,
+                                               y):  # если несколько шариков в ряд и они идут по прямой, отличной от той, на которой лежат
         ball = self.selected[0]
         if self.get_color(ball, x, y) == self.board.white_is_move:
             for ball in self.selected:
@@ -245,7 +244,8 @@ class Main:
         else:
             self.move_restart()
 
-    def go_to(self, X, Y):   # передаю вектор хода и проверяю, правильно ли относительно друг друга расположны шарики, вызываю другие проверки корректности зода
+    def go_to(self, X,
+              Y):  # передаю вектор хода и проверяю, правильно ли относительно друг друга расположны шарики, вызываю другие проверки корректности зода
 
         var = self.selected
         var2 = self.check_color  # куча проверок корректности хода
@@ -308,7 +308,7 @@ class Main:
 
         return wrapper
 
-    def draw_buttons(self):   # отрисовка кнопок под шарики
+    def draw_buttons(self):  # отрисовка кнопок под шарики
         for i in range(5):
             for j in range(9 - i):
                 b = Button(root, activebackground='blue', relief=FLAT, command=self.tap(4 + i, i + j))
@@ -326,7 +326,7 @@ class Main:
 
         self.update()
 
-    def new_game(self): # новая игра
+    def new_game(self):  # новая игра
 
         self.board = Board()
         self.board.update_draw_array()
@@ -338,8 +338,9 @@ class Main:
         self.counter2.config(text='black: ' + str(self.board.black))
         self.counter1.pack()
         self.counter2.pack()
-       # self.board.white_is_move = self.client.color
-        # графика
+
+    # self.board.white_is_move = self.client.color
+    # графика
 
     def check_win(self):
         if self.board.white == 8:
@@ -360,9 +361,9 @@ class Main:
             self.new_game()
 
     def update(self, *desk):  # обновление графики
-        if desk!=():
+        if desk != ():
             desk = [list(i) for i in desk]
-            self.board.draw_array=desk
+            self.board.draw_array = desk
             self.selected.clear()
             sleep(0.7)
             self.board.white_is_move = - self.board.white_is_move
@@ -396,7 +397,7 @@ class Main:
         self.check_win()
         root.update()
 
-    def go_to1(self, x, y): # управление пкм
+    def go_to1(self, x, y):  # управление пкм
 
         var = self.selected
         var2 = self.check_color  # куча проверок корректности хода
@@ -453,7 +454,6 @@ class Main:
             self.move_restart()
         if 1 in colors and -1 in colors:
             self.move_restart()
-
 
     def vect(self, x, y, therefr):  # определяю угол наклона вектора к точку, куда нажали. Управление пкм
         a = self.selected
@@ -526,71 +526,72 @@ class Main:
             for j in range(len(d[i])):
                 d[i][j] = int(d[i][j])
             d[i] = tuple(d[i])
-       # d = d[:-1]
+        # d = d[:-1]
         return d
 
-
-    def last(self): # предыдущий ход
-        if self.board.cmove!=0:
-            game=self.board.Logger.read_file(self.board.Logger.gameInfoFileName)
-            self.board.cmove-=1
-            i=self.board.cmove
+    def last(self):  # предыдущий ход
+        if self.board.cmove != 0:
+            game = self.board.Logger.read_file(self.board.Logger.gameInfoFileName)
+            self.board.cmove -= 1
+            i = self.board.cmove
             d = game[i]
             d = self.deskarray_from_str_to_tuple(d)
             d = d[:-1]
             self.board.Logger.line_del()
-            self.update(d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8])
+            self.update(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
 
     def rename(self, name):
-        #self.board.Logger.gameInfoFileName = name
-        #namelog = 'Log'+str(name[4:])
-        #self.board.Logger.logFileName = namelog
-        #try:
+        # self.board.Logger.gameInfoFileName = name
+        # namelog = 'Log'+str(name[4:])
+        # self.board.Logger.logFileName = namelog
+        # try:
         #    with open(name) as f:
         #        self.board.cmove= len(f.readlines())  #надо убрать перемернную в логгере одну
-        #except Exception:
+        # except Exception:
         #    self.board.cmove=0
         pass
 
-    def test(self):   # просмотр старой игры
-        d=self.board.Logger.directory
-        v=self.board.Logger.read_file
-        var=self.update
-        rename=self.rename
+    def test(self):  # просмотр старой игры
+        d = self.board.Logger.directory
+        v = self.board.Logger.read_file
+        var = self.update
+        rename = self.rename
 
         def wrapper(v=self.board.Logger.read_file, var=self.update, d=self.board.Logger.directory, rename=self.rename):
             name = self.board.Logger.directory()
             self.rename(name)
-            var=self.update
-            desk=self.board.Logger.read_file(name)
+            var = self.update
+            desk = self.board.Logger.read_file(name)
             for d in desk:
-                d=d[1:-1]
-                d=d[0:-1]
+                d = d[1:-1]
+                d = d[0:-1]
                 d = d.split(']')
                 for i in range(9):
-                    if i > 0 :
+                    if i > 0:
                         d[i] = d[i][3:]
                     else:
                         d[i] = d[i][1:]
                     d[i] = d[i].split(',')
                     for j in range(len(d[i])):
-                        d[i][j]=int(d[i][j])
-                    d[i]=tuple(d[i])
-                d=d[:-1]
+                        d[i][j] = int(d[i][j])
+                    d[i] = tuple(d[i])
+                d = d[:-1]
                 print(d)
-                self.update(d[0],d[1],d[2],d[3],d[4],d[5],d[6],d[7],d[8])
+                self.update(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
 
         return wrapper
 
-    def dir(self, event): # координаты нажатия вне поля
+    def dir(self, event):  # координаты нажатия вне поля
         x = event.x
         y = event.y
         self.vect(x, y, 0)
 
     def last_move(self):
-        l=self.last
+        l = self.last
+
         def wrapper(l=self.last):
             self.last()
+
         return wrapper
     # def direction(self, event):
     #     X=event.x
@@ -601,15 +602,16 @@ class Main:
     #
     #     return wrapper
 
-
     # def draw_direction(self,x,y):
     #     [x,y]=self.vect(x,y, 'draw')
     #     print([x,y])
+
+
 if __name__ == "__main__":
     m = Main()
 
-    #start = Button(text='Новая игра', command=m.new_game)
-    #start.place(x=100, y = 225)
+    # start = Button(text='Новая игра', command=m.new_game)
+    # start.place(x=100, y = 225)
     root.bind('<w>', m.go_to(-1, -1))
     root.bind('<e>', m.go_to(-1, 0))
     root.bind('<d>', m.go_to(0, 1))
@@ -617,7 +619,7 @@ if __name__ == "__main__":
     root.bind('<z>', m.go_to(1, 0))
     root.bind('<a>', m.go_to(0, -1))
     canv.bind('<Button-3>', m.dir)
-    #canv.bind('<Motion>', m.direction)
+    # canv.bind('<Motion>', m.direction)
     # выбор направления
     up1 = Button(text='-', image=but1, relief=FLAT, command=m.go_to(-1, -1))
     up1.place(x=870, y=700)
@@ -633,7 +635,6 @@ if __name__ == "__main__":
     down2.place(x=920, y=800)
 
 
-
     def info():
         easygui.msgbox('''
 Прежде нужно выделить шарики, которыми вы будете ходить. Затем нужно выбрать направление, есть три способа:
@@ -642,6 +643,8 @@ if __name__ == "__main__":
 Кнопки со стрелочками на поле
 Чтобы продолжить старую партию, нужно выбрать файл из папки gameInfo
         ''')
+
+
     def rules():
         easygui.msgbox('''
 Вы можете выделять шарики только на одной прямой.
@@ -650,11 +653,12 @@ if __name__ == "__main__":
 либо большее количество ваших шариков толкнуло меньшее количество шариков противника.
 (2 против 1, 3 против 1 и 2)
 Цель: вытолкнуть 8 шариков противника.
-        ''' )
+        ''')
+
 
     mainmenu.add_command(label='Новая игра', command=m.new_game)
     mainmenu.add_command(label='Отмена хода', command=m.last_move())
-    mainmenu.add_command(label='Правила игры',command=rules)
+    mainmenu.add_command(label='Правила игры', command=rules)
     mainmenu.add_command(label='Управление', command=info)
     mainmenu.add_command(label='Продолжить старую партию', command=m.test())
 
